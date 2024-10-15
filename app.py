@@ -48,6 +48,7 @@ from Routes.Web.TBL_NOTIFICACIONES_DOCENTES.notificaciones_docentes_bp import no
 from Routes.Web.TBL_SOLICITANTES.solicitantes_routes import solicitantes_bp
 from Routes.Web.TBL_REGISTRO_ACCESO_DOCENTE.registro_acceso_bp import registro_acceso_bp
 from Routes.Web.TBL_REGISTRO_ACCESO_ALUMNO.registro_acceso_alumno_bp import registro_acceso_alumnos_bp
+from Routes.Web.TBL_FEEDBACK.feedback import feedback_bp
 #?: LOGIN - REGISTRO - RECUPERACION - FORMULARIOS
 from Routes.Auth.AuthLogin.auth_routes import auth_bp
 from Routes.Auth.AuthRegister.register_routes import register_bp
@@ -153,6 +154,8 @@ app.register_blueprint(notificaciones_docentes_bp,url_prefix='/api')
 app.register_blueprint(registro_acceso_bp,url_prefix='/api')
 app.register_blueprint(registro_acceso_alumnos_bp, url_prefix='/api')
 app.register_blueprint(solicitantes_bp,url_prefix='/api')
+app.register_blueprint(feedback_bp,url_prefix='/api')
+
 app.register_blueprint(wear_bp)
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=50003)
+    serve(app, host='0.0.0.0', port=50013)

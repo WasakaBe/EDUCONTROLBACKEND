@@ -321,3 +321,9 @@ class TBL_REGISTRO_ACCESO_ALUMNO(db.Model):
     nombre_alumnox = db.Column(db.String(255), nullable=False)
     fecha_registro_acceso_alumno = db.Column(db.DateTime, nullable=False)
     codigo_qr_alumno = db.Column(db.String(255), nullable=True)
+    
+class TBL_FEEDBACK(db.Model):
+    id_feedback = db.Column(db.Integer, primary_key = True)
+    idusuario= db.Column(db.Integer, db.ForeignKey('tbl_usuarios.id_usuario'), nullable=False)
+    emocion_feedback = db.Column(db.String(30))
+    motivo_feedback = db.Column(db.Text())
