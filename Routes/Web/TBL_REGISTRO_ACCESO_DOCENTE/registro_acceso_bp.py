@@ -66,7 +66,7 @@ def registrar_acceso_docente(user_id):
         except SQLAlchemyError as e:
             db.session.rollback()
             return jsonify({
-                'error': f"Registro de acceso exitoso, pero hubo un error al registrar la notificación: {str(e)}"
+                'error': f" Registro de acceso exitoso, pero hubo un error al registrar la notificación: {str(e)}"
             }), 500
 
         # 6. Respuesta exitosa
