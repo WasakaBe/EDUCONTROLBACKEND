@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\mtzal\OneDrive\Escritorio\Api_Backend_Edu_Control_Oficial\venv
+set VIRTUAL_ENV=C:\Users\mtzal\OneDrive\Escritorio\EDUCONTROL-CBTA\Api_Backend_Edu_Control_Oficial\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
