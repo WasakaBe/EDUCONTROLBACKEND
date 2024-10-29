@@ -4,6 +4,13 @@ from sqlalchemy.types import JSON
 
 db = SQLAlchemy()
 
+#es para las suscripciones de notificaciones psuh  
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    endpoint = db.Column(db.String, nullable=False)
+    keys_p256dh = db.Column(db.String, nullable=False)
+    keys_auth = db.Column(db.String, nullable=False)
+    
 # Clases Principales de la base de datos
 class TBL_TIPO_ROL(db.Model):
     id_tipo_rol = db.Column(db.Integer, primary_key=True)
