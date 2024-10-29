@@ -6,7 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from waitress import serve
 from dotenv import load_dotenv
-from Database.Database import db
+from Database.Database import db , PushSubscription
+from pywebpush import webpush, WebPushException
 
 
 # Importa y registra los blueprints después de inicializar db
@@ -58,6 +59,13 @@ from Routes.Wear.wear  import wear_bp
 
 # Cargar las variables de entorno
 load_dotenv()
+
+VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+VAPID_CLAIMS = {
+    "sub": "mailto:tu-email@example.com"
+}
+
 
 # Configuración de logging
 logging.getLogger('waitress.queue').setLevel(logging.ERROR)
@@ -111,7 +119,64 @@ def download_example_docent_csv():
     except FileNotFoundError:
         return jsonify({'error': 'Archivo no encontrado'}), 404
 
+@app.route('/api/subscribe', methods=['POST'])
+def subscribe():
+    data = request.get_json()
+    try:
+        # Extraer los datos de la suscripción desde la solicitud
+        endpoint = data.get("endpoint")
+        keys = data.get("keys")
+        keys_p256dh = keys.get("p256dh")
+        keys_auth = keys.get("auth")
 
+        # Crear una nueva entrada de suscripción
+        new_subscription = PushSubscription(endpoint, keys_p256dh, keys_auth)
+        db.session.add(new_subscription)
+        db.session.commit()
+
+        return jsonify({"message": "Suscripción almacenada con éxito"}), 201
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({"error": "Error de la base de datos"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/notify', methods=['POST'])
+def notify():
+    try:
+        # Aquí asumimos que el payload (el mensaje a enviar) viene en el cuerpo de la solicitud
+        data = request.get_json()
+        message = data.get("message", "¡Tienes una nueva notificación!")
+
+        # Recuperar todas las suscripciones de la base de datos
+        subscriptions = PushSubscription.query.all()
+
+        # Iterar sobre cada suscripción y enviar la notificación
+        for sub in subscriptions:
+            subscription_info = {
+                "endpoint": sub.endpoint,
+                "keys": {
+                    "p256dh": sub.keys_p256dh,
+                    "auth": sub.keys_auth
+                }
+            }
+            try:
+                # Enviar la notificación a cada suscriptor
+                webpush(
+                    subscription_info,
+                    message,
+                    vapid_private_key=VAPID_PRIVATE_KEY,
+                    vapid_claims=VAPID_CLAIMS
+                )
+                print(f"Notificación enviada a {sub.endpoint}")
+            except WebPushException as ex:
+                print(f"Error al enviar la notificación: {ex}")
+
+        return jsonify({"message": "Notificaciones enviadas"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 app.register_blueprint(tipo_rol_bp, url_prefix='/api')
 app.register_blueprint(sexos_bp, url_prefix='/api')
@@ -158,4 +223,4 @@ app.register_blueprint(feedback_bp,url_prefix='/api')
 
 app.register_blueprint(wear_bp)
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=50013)
+    serve(app, host='0.0.0.0', port=50023)
