@@ -14,9 +14,18 @@
   ],
   "functions": {
     "app.py": {
-      "maxDuration": 10,
-      "memory": 128,
-      "includeFiles": ["app.py", "Database/**", "Routes/**", "static/**", "templates/**"]
+      "includeFiles": [
+        "app.py",
+        "Database/**",
+        "Routes/**",
+        "Templates/**"
+      ],
+      "excludeFiles": [
+        "venv/**",
+        "static/**",
+        "uploads/**",
+        "__pycache__/**"
+      ]
     }
   }
 }
