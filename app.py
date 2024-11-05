@@ -222,8 +222,7 @@ app.register_blueprint(solicitantes_bp,url_prefix='/api')
 app.register_blueprint(feedback_bp,url_prefix='/api')
 
 app.register_blueprint(wear_bp)
-#if __name__ == '__main__':
-#    serve(app, host='0.0.0.0', port=50023)
+
 if __name__ == '__main__':
     app.run()
 
