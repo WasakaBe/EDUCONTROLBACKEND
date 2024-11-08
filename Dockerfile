@@ -1,24 +1,19 @@
-# Usa una imagen base de Python
-FROM python:3.9-slim
+# Usa una imagen de Microsoft que ya contiene los controladores de SQL Server
+FROM mcr.microsoft.com/azure-sql-edge:latest
 
-# Actualiza el sistema e instala los paquetes necesarios
+# Instala Python y otras dependencias de sistema
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev && \
-    apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    apt-get install -y python3 python3-pip unixodbc-dev
 
 # Instala las dependencias de Python
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Copia el código del backend
 COPY . .
 
-# Expone el puerto esperado por Render (10000)
-EXPOSE 10000
+# Expone el puerto
+EXPOSE 50023
 
-# Comando para ejecutar la aplicación en el puerto 10000
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+# Comando para ejecutar la aplicación
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:50023"]
