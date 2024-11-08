@@ -19,7 +19,7 @@ http_ece==1.2.1
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
-logging==0.4.9.6
+# logging==0.4.9.6
 MarkupSafe==3.0.1
 multidict==6.1.0
 numpy==2.1.2
