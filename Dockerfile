@@ -1,8 +1,14 @@
 FROM python:3.9-slim
 
 RUN pip install --upgrade pip setuptools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    make \
+    curl
+
 RUN apt-get update && \
-    apt-get install -y curl gnupg unixodbc-dev build-essential && \
+    apt-get install -y build-essential libssl-dev libffi-dev python3-dev\
     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
