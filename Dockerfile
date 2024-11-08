@@ -12,9 +12,13 @@ RUN apt-get update && \
 # Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia el archivo de dependencias y lo instala
+# Crear un entorno virtual para aislar las dependencias
+RUN python -m venv /opt/venv
+
+# Activa el entorno virtual e instala dependencias
+ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
-RUN pip install --upgrade pip  # <- Agregar aquí
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Copia el código de la aplicación al contenedor
