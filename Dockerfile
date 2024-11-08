@@ -6,11 +6,11 @@ RUN apt-get update && \
     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Variables de entorno para ODBC
-ENV LD_LIBRARY_PATH=/opt/microsoft/msodbcsql17/lib64:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/opt/microsoft/msodbcsql18/lib64:$LD_LIBRARY_PATH
 
 # Instala las dependencias de Python
 COPY requirements.txt .
