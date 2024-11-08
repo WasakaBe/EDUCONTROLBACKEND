@@ -10,6 +10,7 @@ from Database.Database import db , PushSubscription
 from pywebpush import webpush, WebPushException
 import pyodbc
 
+
 # Importa y registra los blueprints después de inicializar db
 from Routes.Web.TBL_TIPO_ROL.tipo_rol_routes import tipo_rol_bp
 from Routes.Web.TBL_SEXOS.sexos_routes import sexos_bp
