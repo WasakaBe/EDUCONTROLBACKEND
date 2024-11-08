@@ -1,26 +1,23 @@
 # Usa una imagen base de Python
-FROM python:3.9
+FROM python:3.9-slim
 
-# Instala dependencias de sistema
+# Actualiza el sistema e instala los paquetes necesarios
 RUN apt-get update && \
-    apt-get install -y curl apt-transport-https gnupg && \
+    apt-get install -y curl gnupg && \
     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev && \
-    apt-get clean -y
-
-# Establece el directorio de trabajo
-WORKDIR /app
-
-# Copia los archivos de la aplicación
-COPY . .
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
 # Instala las dependencias de Python
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Expone el puerto de la aplicación Flask
+# Copia el código del backend
+COPY . .
+
+# Expone el puerto
 EXPOSE 50023
 
 # Comando para ejecutar la aplicación
-CMD ["gunicorn", "-b", "0.0.0.0:50023", "app:app"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:50023"]
