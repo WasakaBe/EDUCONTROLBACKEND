@@ -240,4 +240,4 @@ app.register_blueprint(feedback_bp,url_prefix='/api')
 
 app.register_blueprint(wear_bp)
 if __name__ == '__main__':
-    serve(app, host='127.0.0.1', port=50023)
+    serve(app, host='127.0.0.1', port=10000)
