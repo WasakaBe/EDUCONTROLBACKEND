@@ -8,7 +8,7 @@ from waitress import serve
 from dotenv import load_dotenv
 from Database.Database import db , PushSubscription
 from pywebpush import webpush, WebPushException
-
+import pyodbc
 
 # Importa y registra los blueprints después de inicializar db
 from Routes.Web.TBL_TIPO_ROL.tipo_rol_routes import tipo_rol_bp
@@ -66,7 +66,6 @@ VAPID_CLAIMS = {
     "sub": "mailto:tu-email@example.com"
 }
 
-
 # Configuración de logging
 logging.getLogger('waitress.queue').setLevel(logging.ERROR)
 
@@ -90,6 +89,23 @@ def handle_error(e):
         return jsonify({'error': 'Error de la base de datos'}), 500
     return jsonify({'error': str(e)}), 500
 
+
+try:
+    connection = pyodbc.connect(
+        'DRIVER={ODBC Driver 18 for SQL Server};'
+        'SERVER=educontrolservidor.database.windows.net;'
+        'DATABASE=EDUCBTAOFICIAL;'
+        'UID=adminsql;'
+        'PWD=Telcel4773;'
+        'Encrypt=yes;'
+        'TrustServerCertificate=no;'
+        'Connection Timeout=30;'
+    )
+    print("Conexión exitosa a la base de datos.")
+    connection.close()
+except pyodbc.Error as e:
+    print("Error al conectar a la base de datos:", e)
+    
 # Ruta principal
 @app.route('/')
 def hello_world():
@@ -178,6 +194,7 @@ def notify():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 app.register_blueprint(tipo_rol_bp, url_prefix='/api')
 app.register_blueprint(sexos_bp, url_prefix='/api')
 app.register_blueprint(activos_cuentas_bp, url_prefix='/api')
@@ -222,7 +239,5 @@ app.register_blueprint(solicitantes_bp,url_prefix='/api')
 app.register_blueprint(feedback_bp,url_prefix='/api')
 
 app.register_blueprint(wear_bp)
-
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=50023)
-
+    serve(app, host='127.0.0.1', port=50023)
