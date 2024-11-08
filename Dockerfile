@@ -1,13 +1,20 @@
-# Usa una imagen de Microsoft que ya contiene los controladores de SQL Server
-FROM mcr.microsoft.com/azure-sql-edge:latest
+FROM python:3.9-slim
 
-# Instala Python y otras dependencias de sistema
+# Instala solo el driver ODBC y sus dependencias
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip unixodbc-dev
+    apt-get install -y curl gnupg apt-transport-https ca-certificates && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Variables de entorno para ODBC
+ENV LD_LIBRARY_PATH=/opt/microsoft/msodbcsql17/lib64:$LD_LIBRARY_PATH
 
 # Instala las dependencias de Python
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia el código del backend
 COPY . .
