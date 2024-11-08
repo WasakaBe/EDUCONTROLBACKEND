@@ -64,7 +64,7 @@ load_dotenv()
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 VAPID_CLAIMS = {
-    "sub": "mailto:tu-email@example.com"
+    "sub": "mailto:mtzalan080@gmail.com"
 }
 
 # Configuración de logging
@@ -93,7 +93,7 @@ def handle_error(e):
 
 try:
     connection = pyodbc.connect(
-        'DRIVER={ODBC Driver 18 for SQL Server};'
+        'DRIVER={ODBC Driver 17 for SQL Server};'
         'SERVER=educontrolservidor.database.windows.net;'
         'DATABASE=EDUCBTAOFICIAL;'
         'UID=adminsql;'
