@@ -226,7 +226,7 @@ def get_alumno(id):
     }), 200
 
 # Ruta para actualizar un alumno por su ID
-@alumnos_bp.route('/alumno/<int:id>', methods=['PUT'])
+@alumnos_bp.route('/alumno-update/<int:id>', methods=['PUT'])
 def update_alumno(id):
     data = request.get_json()
     alumno = TBL_ALUMNOS.query.get(id)
