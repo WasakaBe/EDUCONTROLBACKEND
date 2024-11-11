@@ -9,6 +9,21 @@ from base64 import b64encode, b64decode
 
 alumnos_bp = Blueprint('alumnos_bp', __name__)
 
+
+@alumnos_bp.route('/alumno/simple', methods=['GET'])
+def get_all_alumnos_simple():
+    alumnos = TBL_ALUMNOS.query.all()
+    result = []
+    for alumno in alumnos:
+        result.append({
+            'id_alumnos': alumno.id_alumnos,
+            'nombre_alumnos': alumno.nombre_alumnos,
+            'app_alumnos': alumno.app_alumnos,
+            'apm_alumnos': alumno.apm_alumnos,
+            # Añadir otros campos necesarios
+        })
+    return jsonify(result), 200
+
 # Ruta para insertar un nuevo alumno
 @alumnos_bp.route('/alumno/insert', methods=['POST'])
 def create_alumno():
