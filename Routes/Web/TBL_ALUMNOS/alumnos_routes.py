@@ -140,14 +140,14 @@ def get_all_alumnos():
         TBL_USUARIOS.correo_usuario,
         TBL_USUARIOS.foto_usuario
     )\
-    .join(TBL_SEXOS, TBL_ALUMNOS.idSexo == TBL_SEXOS.id_sexos)\
-    .join(TBL_CLINICAS, TBL_ALUMNOS.idClinica == TBL_CLINICAS.id_clinicas)\
-    .join(TBL_CARRERAS_TECNICAS, TBL_ALUMNOS.idCarreraTecnica == TBL_CARRERAS_TECNICAS.id_carrera_tecnica)\
-    .join(TBL_GRADOS, TBL_ALUMNOS.idGrado == TBL_GRADOS.id_grado)\
-    .join(TBL_GRUPOS, TBL_ALUMNOS.idGrupo == TBL_GRUPOS.id_grupos)\
-    .join(TBL_PAISES, TBL_ALUMNOS.idPais == TBL_PAISES.id_pais)\
-    .join(TBL_ESTADOS, TBL_ALUMNOS.idEstado == TBL_ESTADOS.id_estado)\
-    .join(TBL_USUARIOS, TBL_ALUMNOS.idUsuario == TBL_USUARIOS.id_usuario)\
+    .outerjoin(TBL_SEXOS, TBL_ALUMNOS.idSexo == TBL_SEXOS.id_sexos)\
+    .outerjoin(TBL_CLINICAS, TBL_ALUMNOS.idClinica == TBL_CLINICAS.id_clinicas)\
+    .outerjoin(TBL_CARRERAS_TECNICAS, TBL_ALUMNOS.idCarreraTecnica == TBL_CARRERAS_TECNICAS.id_carrera_tecnica)\
+    .outerjoin(TBL_GRADOS, TBL_ALUMNOS.idGrado == TBL_GRADOS.id_grado)\
+    .outerjoin(TBL_GRUPOS, TBL_ALUMNOS.idGrupo == TBL_GRUPOS.id_grupos)\
+    .outerjoin(TBL_PAISES, TBL_ALUMNOS.idPais == TBL_PAISES.id_pais)\
+    .outerjoin(TBL_ESTADOS, TBL_ALUMNOS.idEstado == TBL_ESTADOS.id_estado)\
+    .outerjoin(TBL_USUARIOS, TBL_ALUMNOS.idUsuario == TBL_USUARIOS.id_usuario)\
     .all()
 
     result = []
