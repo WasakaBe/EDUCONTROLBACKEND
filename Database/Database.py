@@ -11,6 +11,7 @@ class PushSubscription(db.Model):
     endpoint = db.Column(db.String, nullable=False)
     keys_p256dh = db.Column(db.String, nullable=False)
     keys_auth = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
     
 # Clases Principales de la base de datos
 class TBL_TIPO_ROL(db.Model):
