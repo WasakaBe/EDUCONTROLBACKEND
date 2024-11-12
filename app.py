@@ -1,5 +1,8 @@
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import os
 import logging
+import smtplib
 from flask import Flask, jsonify, request,send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -148,18 +151,20 @@ def subscribe():
         keys = data.get("keys", {})
         keys_p256dh = keys.get("p256dh")
         keys_auth = keys.get("auth")
+        email = data.get("email")  # Agregar email
 
         # Verificar que todos los datos necesarios estén presentes
-        if not endpoint or not keys_p256dh or not keys_auth:
+        if not endpoint or not keys_p256dh or not keys_auth or not email:
             return jsonify({"error": "Datos de suscripción incompletos."}), 400
 
         # Imprimir los datos procesados antes de insertarlos en la base de datos
         print("Endpoint:", endpoint)
         print("keys_p256dh:", keys_p256dh)
         print("keys_auth:", keys_auth)
+        print("email:", email)
 
         # Crear una nueva entrada de suscripción
-        new_subscription = PushSubscription(endpoint=endpoint, keys_p256dh=keys_p256dh, keys_auth=keys_auth)
+        new_subscription = PushSubscription(endpoint=endpoint, keys_p256dh=keys_p256dh, keys_auth=keys_auth,email=email)
         db.session.add(new_subscription)
         db.session.commit()
 
@@ -175,41 +180,82 @@ def subscribe():
 
 
 
+# Modificación de la API de notificación para enviar notificación y correo electrónico después de la autenticación
 @app.route('/api/notify', methods=['POST'])
 def notify():
     try:
-        # Aquí asumimos que el payload (el mensaje a enviar) viene en el cuerpo de la solicitud
+        # Datos recibidos en el cuerpo de la solicitud
         data = request.get_json()
+        email = data.get("email")
         message = data.get("message", "¡Tienes una nueva notificación!")
 
-        # Recuperar todas las suscripciones de la base de datos
-        subscriptions = PushSubscription.query.all()
+        # Verificar que el 'email' fue proporcionado
+        if not email:
+            return jsonify({"error": "Falta el email del usuario a notificar"}), 400
 
-        # Iterar sobre cada suscripción y enviar la notificación
-        for sub in subscriptions:
-            subscription_info = {
-                "endpoint": sub.endpoint,
-                "keys": {
-                    "p256dh": sub.keys_p256dh,
-                    "auth": sub.keys_auth
-                }
+        # Buscar la suscripción correspondiente en la base de datos usando el email
+        subscription = PushSubscription.query.filter_by(email=email).first()
+
+        # Verificar si existe la suscripción
+        if not subscription:
+            return jsonify({"error": "Suscripción no encontrada para el email proporcionado"}), 404
+
+        # Preparar la información de la suscripción
+        subscription_info = {
+            "endpoint": subscription.endpoint,
+            "keys": {
+                "p256dh": subscription.keys_p256dh,
+                "auth": subscription.keys_auth
             }
-            try:
-                # Enviar la notificación a cada suscriptor
-                webpush(
-                    subscription_info,
-                    message,
-                    vapid_private_key=VAPID_PRIVATE_KEY,
-                    vapid_claims=VAPID_CLAIMS
-                )
-                print(f"Notificación enviada a {sub.endpoint}")
-            except WebPushException as ex:
-                print(f"Error al enviar la notificación: {ex}")
+        }
 
-        return jsonify({"message": "Notificaciones enviadas"}), 200
+        # Enviar la notificación al suscriptor
+        webpush(
+            subscription_info,
+            message,
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims=VAPID_CLAIMS
+        )
+        print(f"Notificación enviada a {subscription.endpoint}")
+
+        # Enviar un correo electrónico al usuario notificándole
+        send_email(subscription.email, 'Nueva Notificación', 'Estimado usuario, tienes una nueva notificación.')
+
+        return jsonify({"message": "Notificación enviada con éxito"}), 200
+
+    except WebPushException as ex:
+        print(f"Error al enviar la notificación: {ex}")
+        return jsonify({"error": f"Error al enviar la notificación: {str(ex)}"}), 500
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
+
+# Función para enviar correos electrónicos
+def send_email(to, subject, user_name):
+    remitente = os.getenv('USER')
+    destinatario = to
+
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['From'] = remitente
+    msg['To'] = destinatario
+
+    with open('Templates/notificaciones.html', 'r') as archivo:
+        html_content = archivo.read()
+
+    # Reemplaza la etiqueta {{user_name}} en el HTML con el nombre del usuario
+    html_content = html_content.replace('{{user_name}}', user_name)
+
+    msg.attach(MIMEText(html_content, 'html'))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(remitente, os.getenv('PWD'))
+
+    server.sendmail(remitente, destinatario, msg.as_string())
+    server.quit()
+
 
 
 app.register_blueprint(tipo_rol_bp, url_prefix='/api')
