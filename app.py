@@ -140,6 +140,9 @@ def download_example_docent_csv():
 def subscribe():
     data = request.get_json()
     try:
+        # Imprimir los datos recibidos para depuración
+        print("Datos recibidos:", data)
+
         # Extraer los datos de la suscripción desde la solicitud
         endpoint = data.get("endpoint")
         keys = data.get("keys", {})
@@ -150,6 +153,11 @@ def subscribe():
         if not endpoint or not keys_p256dh or not keys_auth:
             return jsonify({"error": "Datos de suscripción incompletos."}), 400
 
+        # Imprimir los datos procesados antes de insertarlos en la base de datos
+        print("Endpoint:", endpoint)
+        print("keys_p256dh:", keys_p256dh)
+        print("keys_auth:", keys_auth)
+
         # Crear una nueva entrada de suscripción
         new_subscription = PushSubscription(endpoint=endpoint, keys_p256dh=keys_p256dh, keys_auth=keys_auth)
         db.session.add(new_subscription)
@@ -159,9 +167,12 @@ def subscribe():
 
     except SQLAlchemyError as e:
         db.session.rollback()
-        return jsonify({"error": "Error de la base de datos"}), 500
+        print("Error de SQLAlchemy:", str(e))  # Imprimir el error específico
+        return jsonify({"error": f"Error de la base de datos: {str(e)}"}), 500
     except Exception as e:
+        print("Error inesperado:", str(e))  # Imprimir cualquier otro error
         return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
 
 
 @app.route('/api/notify', methods=['POST'])
