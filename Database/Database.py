@@ -6,6 +6,7 @@ db = SQLAlchemy()
 
 #es para las suscripciones de notificaciones psuh  
 class PushSubscription(db.Model):
+    __tablename__ = 'PushSubscription'
     id = db.Column(db.Integer, primary_key=True)
     endpoint = db.Column(db.String, nullable=False)
     keys_p256dh = db.Column(db.String, nullable=False)
