@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificación Recibida</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .notification-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+        .notification-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        .notification-message {
+            margin-top: 15px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .notification-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+        .btn-acknowledge {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #4caf50;
+            color: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-acknowledge:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notification-container">
+        <div class="notification-header">¡Nueva Notificación!</div>
+        <div class="notification-message">
+            Estimado/a {{user_name}}!  , tienes una nueva notificación. 
+            <br>Revisa tu aplicación para obtener más detalles.
+        </div>
+        <button class="btn-acknowledge" onclick="closeNotification()">Aceptar</button>
+        <div class="notification-footer">
+            <small>Gracias por ser parte de nuestra comunidad.</small>
+        </div>
+    </div>
+
+    <script>
+        function closeNotification() {
+            alert('Notificación reconocida');
+        }
+    </script>
+    
+</body>
+</html>
