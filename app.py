@@ -142,12 +142,16 @@ def subscribe():
     try:
         # Extraer los datos de la suscripción desde la solicitud
         endpoint = data.get("endpoint")
-        keys = data.get("keys")
+        keys = data.get("keys", {})
         keys_p256dh = keys.get("p256dh")
         keys_auth = keys.get("auth")
 
+        # Verificar que todos los datos necesarios estén presentes
+        if not endpoint or not keys_p256dh or not keys_auth:
+            return jsonify({"error": "Datos de suscripción incompletos."}), 400
+
         # Crear una nueva entrada de suscripción
-        new_subscription = PushSubscription(endpoint, keys_p256dh, keys_auth)
+        new_subscription = PushSubscription(endpoint=endpoint, keys_p256dh=keys_p256dh, keys_auth=keys_auth)
         db.session.add(new_subscription)
         db.session.commit()
 
@@ -157,7 +161,8 @@ def subscribe():
         db.session.rollback()
         return jsonify({"error": "Error de la base de datos"}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
 
 @app.route('/api/notify', methods=['POST'])
 def notify():
