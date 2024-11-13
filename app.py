@@ -76,8 +76,9 @@ logging.getLogger('waitress.queue').setLevel(logging.ERROR)
 # Inicializar la aplicación Flask
 app = Flask(__name__)
 # Configuración de CORS
-CORS(app, supports_credentials=True)
-
+#CORS(app, supports_credentials=True)
+# Configuración de CORS (permite todas las solicitudes desde cualquier origen)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 # Configuración de SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
