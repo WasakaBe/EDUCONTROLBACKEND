@@ -6,31 +6,33 @@ from flask import Blueprint, jsonify, request
 feedback_bp = Blueprint('feedback_bp', __name__)
 
 # Ruta para crear un feedback
+# Ruta para crear un feedback
 @feedback_bp.route('/create/feedback', methods=['POST'])
 def create_feedback():
     try:
         data = request.json
         idusuario = data.get('idusuario')
         emocion_feedback = data.get('emocion_feedback')
-        motivo_feedback = data.get('motivo_feedback')
 
-        if not idusuario or not motivo_feedback:
+        # Validar que los datos obligatorios estén presentes
+        if not idusuario or not emocion_feedback:
             return jsonify({'error': 'Faltan datos obligatorios'}), 400
 
+        # Crear nuevo feedback solo con idusuario y emocion_feedback
         new_feedback = TBL_FEEDBACK(
             idusuario=idusuario,
-            emocion_feedback=emocion_feedback,
-            motivo_feedback=motivo_feedback
+            emocion_feedback=emocion_feedback
         )
-        
+
         db.session.add(new_feedback)
         db.session.commit()
-        
+
         return jsonify({'message': 'Feedback creado con éxito', 'id': new_feedback.id_feedback}), 201
 
     except SQLAlchemyError as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Ha ocurrido un error al intentar crear el feedback'}), 500
+
 
 # Ruta para obtener todos los feedbacks con información del usuario
 @feedback_bp.route('/view/feedbacks', methods=['GET'])
