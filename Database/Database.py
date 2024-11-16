@@ -336,4 +336,4 @@ class TBL_FEEDBACK(db.Model):
     idusuario= db.Column(db.Integer, db.ForeignKey('tbl_usuarios.id_usuario'), nullable=False)
     emocion_feedback = db.Column(db.String(30))
     motivo_feedback = db.Column(db.Text())
-    fecha_feedback = Column(DateTime) 
+    fecha_feedback = db.Column(DateTime) 
