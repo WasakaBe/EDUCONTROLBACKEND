@@ -1,11 +1,11 @@
 from base64 import b64encode
+from datetime import datetime, timedelta
 from flask import Flask
 from Database.Database import TBL_USUARIOS, db, TBL_FEEDBACK  # Importamos la clase del modelo
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
 feedback_bp = Blueprint('feedback_bp', __name__)
 
-# Ruta para crear un feedback
 # Ruta para crear un feedback
 @feedback_bp.route('/create/feedback', methods=['POST'])
 def create_feedback():
@@ -18,10 +18,27 @@ def create_feedback():
         if not idusuario or not emocion_feedback:
             return jsonify({'error': 'Faltan datos obligatorios'}), 400
 
-        # Crear nuevo feedback solo con idusuario y emocion_feedback
+        # Verificar si el usuario ya respondió un feedback en los últimos 15 días
+        last_feedback = db.session.query(TBL_FEEDBACK)\
+            .filter(TBL_FEEDBACK.idusuario == idusuario)\
+            .order_by(TBL_FEEDBACK.fecha_feedback.desc())\
+            .first()
+
+        if last_feedback:
+            last_feedback_date = last_feedback.fecha_feedback
+            days_since_last_feedback = (datetime.now() - last_feedback_date).days
+
+            if days_since_last_feedback < 15:
+                return jsonify({
+                    'error': 'El feedback solo puede enviarse cada 15 días.',
+                    'dias_restantes': 15 - days_since_last_feedback
+                }), 403
+
+        # Crear nuevo feedback
         new_feedback = TBL_FEEDBACK(
             idusuario=idusuario,
-            emocion_feedback=emocion_feedback
+            emocion_feedback=emocion_feedback,
+            fecha_feedback=datetime.now()  # Asegúrate de que el modelo tenga este campo
         )
 
         db.session.add(new_feedback)
