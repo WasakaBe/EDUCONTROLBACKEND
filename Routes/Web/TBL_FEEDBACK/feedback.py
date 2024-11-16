@@ -6,6 +6,38 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
 feedback_bp = Blueprint('feedback_bp', __name__)
 
+
+@feedback_bp.route('/can-show-feedback/<int:idUsuario>', methods=['GET'])
+def can_show_feedback(idUsuario):
+    try:
+        # Buscar el último feedback del usuario
+        last_feedback = db.session.query(TBL_FEEDBACK)\
+            .filter(TBL_FEEDBACK.idusuario == idUsuario)\
+            .order_by(TBL_FEEDBACK.fecha_feedback.desc())\
+            .first()
+
+        if last_feedback:
+            last_feedback_date = last_feedback.fecha_feedback
+            days_since_last_feedback = (datetime.now() - last_feedback_date).days
+
+            if days_since_last_feedback < 15:
+                return jsonify({
+                    'canShowFeedback': False,
+                    'message': 'El feedback solo puede enviarse cada 15 días.',
+                    'dias_restantes': 15 - days_since_last_feedback
+                }), 200
+
+        # Si no hay feedback previo o ya pasaron 15 días
+        return jsonify({
+            'canShowFeedback': True,
+            'message': 'El usuario puede enviar feedback.'
+        }), 200
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': 'Error al verificar el feedback', 'details': str(e)}), 500
+
+
 # Ruta para crear un feedback
 @feedback_bp.route('/create/feedback', methods=['POST'])
 def create_feedback():
